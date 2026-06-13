@@ -32,3 +32,106 @@ body,
   user-select: none;
   pointer-events: none;
 }
+
+/* Call-to-action hint, bottom-center of the landing scene. */
+.hint {
+  position: fixed;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  padding: 8px 16px;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 13px;
+  color: #aeb8d4;
+  background: rgba(18, 24, 40, 0.5);
+  border-radius: 999px;
+  backdrop-filter: blur(4px);
+  user-select: none;
+  pointer-events: none;
+}
+
+/* --- Detail page --- */
+.planet-page {
+  width: 100%;
+  height: 100%;
+}
+
+.back-link {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 10;
+  padding: 8px 14px;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 14px;
+  text-decoration: none;
+  color: #cdd6f0;
+  background: rgba(18, 24, 40, 0.6);
+  border: 1px solid rgba(120, 140, 190, 0.35);
+  border-radius: 999px;
+  backdrop-filter: blur(4px);
+}
+.back-link:hover {
+  background: rgba(40, 52, 80, 0.85);
+}
+
+.panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 10;
+  width: min(380px, 90vw);
+  height: 100%;
+  padding: 72px 28px 28px;
+  overflow-y: auto;
+  color: #e6ebf7;
+  font-family: 'Roboto', Arial, sans-serif;
+  background: linear-gradient(
+    to left,
+    rgba(10, 14, 26, 0.92),
+    rgba(10, 14, 26, 0.55) 70%,
+    rgba(10, 14, 26, 0)
+  );
+}
+.panel h1 {
+  font-size: 30px;
+  margin-bottom: 6px;
+}
+.panel .tagline {
+  margin-bottom: 18px;
+  font-style: italic;
+  color: #9fb0d8;
+}
+.panel .desc {
+  margin-bottom: 22px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #c7d0e6;
+}
+.facts {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.facts > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(120, 140, 190, 0.15);
+}
+.facts dt {
+  color: #8fa0c8;
+  font-size: 13px;
+}
+.facts dd {
+  text-align: right;
+  font-size: 13px;
+  font-weight: 500;
+}
+.source {
+  margin-top: 22px;
+  font-size: 12px;
+  color: #74809e;
+}
