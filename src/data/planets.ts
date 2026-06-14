@@ -18,6 +18,15 @@ export interface OrbitElements {
   phase: number // initial angle (radians), just to spread bodies out
 }
 
+// A flat ring system (Saturn). Radii are expressed as MULTIPLES of the host
+// body's rendered radius, so the same data works in the orrery (sizeOf) and on
+// the detail page (displayRadius) without re-tuning.
+export interface RingData {
+  texture: string // banded color+alpha map in /public/textures
+  innerScale: number // inner edge ÷ planet radius
+  outerScale: number // outer edge ÷ planet radius
+}
+
 export interface PlanetData {
   id: string // URL slug, e.g. /planet/earth
   name: string
@@ -25,10 +34,12 @@ export interface PlanetData {
   description: string
   texture: string // equirectangular map in /public/textures
   cloudTexture?: string // optional second sphere (Earth)
+  ring?: RingData // optional flat ring system (Saturn)
   displayRadius: number // sphere size on the DETAIL page (stylized, standalone)
   radiusKm: number // real equatorial radius — drives ORRERY relative sizing
   axialTilt?: number // degrees
   emissive?: boolean // true = self-lit (the Sun)
+  dwarfPlanet?: boolean // true = dwarf planet (Pluto) — shown as a subtle note
   orbit?: OrbitElements // heliocentric orbit; omitted for the Sun and the Moon
   facts: PlanetFact[]
 }
@@ -193,10 +204,15 @@ export const planets: PlanetData[] = [
     tagline: 'The ringed jewel of the solar system.',
     description:
       'Saturn is a gas giant famous for its spectacular ring system, made of ' +
-      'countless chunks of ice and rock. It is the least dense planet — it would ' +
-      'float in water if you had a big enough ocean. (Rings are coming in a later ' +
-      'pass.)',
+      'countless chunks of ice and rock that span hundreds of thousands of ' +
+      'kilometres yet are only tens of metres thick. It is the least dense planet ' +
+      '— it would float in water if you had a big enough ocean.',
     texture: '/textures/saturn.jpg',
+    ring: {
+      texture: '/textures/saturn_ring_alpha.png',
+      innerScale: 1.2,
+      outerScale: 2.3,
+    },
     displayRadius: 1,
     radiusKm: 58232,
     axialTilt: 26.7,
@@ -250,6 +266,31 @@ export const planets: PlanetData[] = [
       { label: 'Day length', value: '16.1 hours' },
       { label: 'Year length', value: '164.8 Earth years' },
       { label: 'Moons', value: '16 known' },
+    ],
+  },
+  {
+    id: 'pluto',
+    name: 'Pluto',
+    tagline: 'The most famous dwarf planet, out in the Kuiper Belt.',
+    description:
+      'Pluto is a dwarf planet in the Kuiper Belt, the ring of icy worlds beyond ' +
+      'Neptune. Reclassified from "ninth planet" to "dwarf planet" in 2006, it is ' +
+      'smaller than Earth\'s Moon. Its orbit is so elongated and tilted that it ' +
+      'sometimes comes closer to the Sun than Neptune. NASA\'s New Horizons probe ' +
+      'gave us our first close-up views of its nitrogen-ice plains in 2015.',
+    texture: '/textures/pluto.jpg',
+    displayRadius: 1,
+    radiusKm: 1188,
+    axialTilt: 122.5,
+    dwarfPlanet: true,
+    orbit: { semiMajorAxisAU: 39.48, eccentricity: 0.249, periodYears: 247.94, phase: 2.6 },
+    facts: [
+      { label: 'Classification', value: 'Dwarf planet (since 2006)' },
+      { label: 'Diameter', value: '2,377 km (≈18% of Earth)' },
+      { label: 'Distance from Sun', value: '5.9 billion km (39.5 AU, average)' },
+      { label: 'Day length', value: '6.4 Earth days' },
+      { label: 'Year length', value: '248 Earth years' },
+      { label: 'Moons', value: '5 (Charon, Styx, Nix, Kerberos, Hydra)' },
     ],
   },
 ]

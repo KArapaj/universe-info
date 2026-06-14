@@ -5,6 +5,7 @@ import { Link, Navigate, useParams } from 'react-router-dom'
 import * as THREE from 'three'
 import { TextureLoader } from 'three'
 import { getPlanet, type PlanetData } from '../data/planets'
+import PlanetRing from '../components/PlanetRing'
 
 // Slowly rotating cloud layer for bodies that have one (Earth).
 function CloudLayer({ texture, radius }: { texture: string; radius: number }) {
@@ -44,6 +45,13 @@ function Body({ planet }: { planet: PlanetData }) {
       {planet.cloudTexture && (
         <CloudLayer texture={planet.cloudTexture} radius={planet.displayRadius} />
       )}
+      {planet.ring && (
+        <PlanetRing
+          texture={planet.ring.texture}
+          innerRadius={planet.displayRadius * planet.ring.innerScale}
+          outerRadius={planet.displayRadius * planet.ring.outerScale}
+        />
+      )}
     </group>
   )
 }
@@ -73,7 +81,10 @@ export default function PlanetPage() {
       </Link>
 
       <aside className="panel">
-        <h1>{planet.name}</h1>
+        <h1>
+          {planet.name}
+          {planet.dwarfPlanet && <span className="dwarf-badge">Dwarf planet</span>}
+        </h1>
         <p className="tagline">{planet.tagline}</p>
         <p className="desc">{planet.description}</p>
         <dl className="facts">

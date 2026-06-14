@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import * as THREE from 'three'
 import { TextureLoader } from 'three'
 import { getPlanet, planets, type PlanetData } from '../data/planets'
+import PlanetRing from '../components/PlanetRing'
 
 // --- Scene scale (see research/2026-06-13-grill-orrery-scale-and-navigation.md) ---
 // Distances are TRUE relative: scene units = AU × DISTANCE_UNIT.
@@ -119,6 +120,13 @@ function OrbitingBody({
             <sphereGeometry args={[radius, 48, 48]} />
             <meshStandardMaterial map={map} />
           </mesh>
+          {planet.ring && (
+            <PlanetRing
+              texture={planet.ring.texture}
+              innerRadius={radius * planet.ring.innerScale}
+              outerRadius={radius * planet.ring.outerScale}
+            />
+          )}
         </group>
         {planet.id === 'earth' && <Moon positions={positions} onOpenDetails={onOpenDetails} />}
       </group>
