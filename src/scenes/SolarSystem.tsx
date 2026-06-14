@@ -155,44 +155,48 @@ function CameraDirector({
   focusId: string | null
 }) {
   const lastFocus = useRef<string | null>(null)
-  const transitioning = useRef(false)
   const camPos = useRef(new THREE.Vector3())
+  const offset = useRef(new THREE.Vector3())
+  const dest = useRef(new THREE.Vector3())
+  const flightStart = useRef(0)
+  const flightDuration = useRef(0)
 
-  // 'rest' fires when camera motion settles → the glide is done, start following.
-  useEffect(() => {
-    const c = controlsRef.current
-    if (!c) return
-    const onRest = () => {
-      transitioning.current = false
-    }
-    c.addEventListener('rest', onRest)
-    return () => c.removeEventListener('rest', onRest)
-  }, [controlsRef])
-
-  useFrame(() => {
+  useFrame((state) => {
     const c = controlsRef.current
     if (!c || !focusId) return
+    // Live position of the focused body THIS frame (it is still orbiting).
     const target = positions.current.get(focusId)
     if (!target) return
+    const now = state.clock.getElapsedTime()
 
     if (lastFocus.current !== focusId) {
-      // New selection → glide. Stand-off scales with the body's size.
+      // New selection → plan the glide. Stand-off scales with the body's size.
       const radius = focusId === 'sun' ? SUN_RADIUS : sizeOf(getPlanet(focusId)?.radiusKm ?? 1000)
       const d = Math.max(radius * 4, 1.2)
-      const dest = target.clone().add(new THREE.Vector3(d * 0.7, d * 0.45, d * 0.7))
+      offset.current.set(d * 0.7, d * 0.45, d * 0.7)
 
       c.getPosition(camPos.current)
-      const travel = camPos.current.distanceTo(dest)
-      // Sub-linear: ~1s for near hops, capped ~7s for the haul to Neptune.
+      dest.current.copy(target).add(offset.current)
+      const travel = camPos.current.distanceTo(dest.current)
+      // Sub-linear: ~1s for near hops, longer (capped) for the haul to Neptune.
       c.smoothTime = THREE.MathUtils.clamp(Math.sqrt(travel) * 0.11, 0.3, 1.8)
-
-      c.setLookAt(dest.x, dest.y, dest.z, target.x, target.y, target.z, true)
-      transitioning.current = true
+      flightDuration.current = c.smoothTime * 4 // camera-controls settles in ~4× smoothTime
+      flightStart.current = now
       lastFocus.current = focusId
-    } else if (!transitioning.current) {
-      // Locked on → keep the orbit centre glued to the moving body. The user can
-      // still freely rotate/zoom around it (camera-controls keeps its spherical
-      // offset when the target moves).
+    }
+
+    if (now - flightStart.current < flightDuration.current) {
+      // FLYING — chase the body's LIVE position so we arrive on it, not where it
+      // was at click-time. This is what kills the "teleport on arrival" snap.
+      dest.current.copy(target).add(offset.current)
+      c.setLookAt(
+        dest.current.x, dest.current.y, dest.current.z,
+        target.x, target.y, target.z,
+        true,
+      )
+    } else {
+      // LOCKED — glue the orbit centre to the moving body. The user can still
+      // freely rotate/zoom (camera-controls keeps its spherical offset).
       c.setTarget(target.x, target.y, target.z, false)
     }
   })
