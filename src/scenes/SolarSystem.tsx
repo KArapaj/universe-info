@@ -1,7 +1,7 @@
 import { Canvas, useFrame, useLoader } from '@react-three/fiber'
 import { CameraControls, Line, Stars } from '@react-three/drei'
 import { Suspense, useEffect, useMemo, useRef, useState, type ElementRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import * as THREE from 'three'
 import { TextureLoader } from 'three'
 import { getPlanet, planets, type PlanetData } from '../data/planets'
@@ -258,6 +258,10 @@ export default function SolarSystem() {
     <>
       <div className="scale-badge">Distances to scale · sizes &amp; Sun exaggerated</div>
       <div className="hint">Pick a planet to fly there · click a body to learn about it</div>
+
+      <Link to="/eclipse" className="eclipse-cta">
+        Watch an eclipse →
+      </Link>
 
       <nav className="planet-list">
         <h2>Bodies</h2>
