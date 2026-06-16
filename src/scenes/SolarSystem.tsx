@@ -6,6 +6,7 @@ import * as THREE from 'three'
 import { TextureLoader } from 'three'
 import { getPlanet, planets, type PlanetData } from '../data/planets'
 import PlanetRing from '../components/PlanetRing'
+import Belt from '../components/Belt'
 
 // --- Scene scale (see research/2026-06-13-grill-orrery-scale-and-navigation.md) ---
 // Distances are TRUE relative: scene units = AU × DISTANCE_UNIT.
@@ -20,6 +21,36 @@ const SUN_RADIUS = 2.0 // hand-set: biggest object, but < Mercury's perihelion (
 const EARTH_PERIOD_SECONDS = 14
 
 const sizeOf = (radiusKm: number) => Math.max(radiusKm * SIZE_SCALE, MIN_SIZE)
+
+// Procedural rock belts. Distances are TRUE relative (AU), like the planets;
+// the whole belt slowly revolves at a Kepler-true rate for its mid-radius, so
+// the Kuiper belt crawls just like the outer planets. `id` doubles as a label.
+const BELTS = [
+  // Asteroid belt: between Mars (1.52 AU) and Jupiter (5.2 AU).
+  {
+    id: 'asteroid',
+    innerAU: 2.1,
+    outerAU: 3.3,
+    count: 2500,
+    thickness: 0.6,
+    minSize: 0.015,
+    maxSize: 0.06,
+    color: '#7c7163',
+    periodYears: 4.6,
+  },
+  // Kuiper belt: icy bodies beyond Neptune (~30 AU); Pluto (39.5 AU) lives here.
+  {
+    id: 'kuiper',
+    innerAU: 33,
+    outerAU: 49,
+    count: 3500,
+    thickness: 3,
+    minSize: 0.05,
+    maxSize: 0.16,
+    color: '#93a7bd',
+    periodYears: 280,
+  },
+]
 
 // A point on an ellipse with one FOCUS at the local origin (Kepler's 1st law).
 function ellipsePoint(a: number, b: number, t: number, out: THREE.Vector3) {
@@ -243,7 +274,20 @@ export default function SolarSystem() {
 
       <Canvas camera={{ position: [0, 30, 60], fov: 50, near: 0.01, far: 5000 }}>
         <ambientLight intensity={0.06} />
-        <Stars radius={400} depth={80} count={8000} factor={4} fade />
+        <Stars radius={700} depth={120} count={8000} factor={4} fade />
+        {BELTS.map((belt) => (
+          <Belt
+            key={belt.id}
+            innerRadius={belt.innerAU * DISTANCE_UNIT}
+            outerRadius={belt.outerAU * DISTANCE_UNIT}
+            count={belt.count}
+            thickness={belt.thickness}
+            minSize={belt.minSize}
+            maxSize={belt.maxSize}
+            color={belt.color}
+            angularSpeed={(Math.PI * 2) / (belt.periodYears * EARTH_PERIOD_SECONDS)}
+          />
+        ))}
         <Suspense fallback={null}>
           <Sun positions={positions} onOpenDetails={openDetails} />
           {orbiting.map((p) => (
