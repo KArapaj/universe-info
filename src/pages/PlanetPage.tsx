@@ -26,14 +26,16 @@ function CloudLayer({ texture, radius }: { texture: string; radius: number }) {
 function Body({ planet }: { planet: PlanetData }) {
   const ref = useRef<THREE.Mesh>(null!)
   const map = useLoader(TextureLoader, planet.texture)
-  const tilt = THREE.MathUtils.degToRad(planet.axialTilt ?? 0)
+  const rotation: [number, number, number] = planet.displayTilt
+    ? (planet.displayTilt.map((d) => THREE.MathUtils.degToRad(d)) as [number, number, number])
+    : [0, 0, THREE.MathUtils.degToRad(planet.axialTilt ?? 0)]
 
   useFrame((_, delta) => {
     ref.current.rotation.y += delta * 0.12
   })
 
   return (
-    <group rotation={[0, 0, tilt]}>
+    <group rotation={rotation}>
       <mesh ref={ref}>
         <sphereGeometry args={[planet.displayRadius, 64, 64]} />
         {planet.emissive ? (

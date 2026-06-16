@@ -38,6 +38,10 @@ export interface PlanetData {
   displayRadius: number // sphere size on the DETAIL page (stylized, standalone)
   radiusKm: number // real equatorial radius — drives ORRERY relative sizing
   axialTilt?: number // degrees
+  // Optional override for the DETAIL page's body orientation ([x,y,z] Euler, degrees).
+  // Defaults to [0, 0, axialTilt]. Used to rotate a texture's bad/no-data region
+  // (e.g. Pluto's unimaged south pole) away from the camera into shadow.
+  displayTilt?: [number, number, number]
   emissive?: boolean // true = self-lit (the Sun)
   dwarfPlanet?: boolean // true = dwarf planet (Pluto) — shown as a subtle note
   orbit?: OrbitElements // heliocentric orbit; omitted for the Sun and the Moon
@@ -282,6 +286,10 @@ export const planets: PlanetData[] = [
     displayRadius: 1,
     radiusKm: 1188,
     axialTilt: 122.5,
+    // New Horizons could not image Pluto's south pole (winter darkness in 2015),
+    // so the texture's southern cap is reconstructed. Tip it down-and-back so the
+    // well-imaged northern/equatorial terrain faces the viewer.
+    displayTilt: [38, 0, 0],
     dwarfPlanet: true,
     orbit: { semiMajorAxisAU: 39.48, eccentricity: 0.249, periodYears: 247.94, phase: 2.6 },
     facts: [
